@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_ip"
+            android:title="IP" />
+        <item
+            android:id="@+id/nav_tracert"
+            android:title="Traceroute" />
+        <item
+            android:id="@+id/nav_css"
+            android:title="Chat Socket Server" />
+        <item
+            android:id="@+id/nav_csc"
+            android:title="Chat Socket Client" />
+
+        <item
+            android:id="@+id/nav_httpserver"
+            android:title="HTTP Server" />
+    </group>
+
+</menu>
