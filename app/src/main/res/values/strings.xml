@@ -9,4 +9,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="refresh_ip">Refresh IP</string>
+    <string name="ip">IP</string>
+    <string name="ping">Ping</string>
+    <string name="pingingwait">---Please, wait---</string>
+    <string name="number_of_packets">Number of packets:</string>
+    <string name="ip_or_url">IP or url</string>
 </resources>

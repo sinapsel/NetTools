@@ -27,7 +27,6 @@ public class IPFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_ip, container, false);
         refreship = view.findViewById(R.id.refreshipbutton);
         iptext = view.findViewById(R.id.iptextview);
-
         iptext.setText(GetIPAddress.getIP());
         refreship.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -4,7 +4,10 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_ip"
-            android:title="IP" />
+            android:title="@string/ip" />
+        <item
+            android:id="@+id/nav_ping"
+            android:title="Ping" />
         <item
             android:id="@+id/nav_tracert"
             android:title="Traceroute" />

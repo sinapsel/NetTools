@@ -16,11 +16,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import simapps.nettools.fragments.IPFragment;
+import simapps.nettools.fragments.PingFragment;
 
 public class MenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     Fragment ipFragment;
+    Fragment pingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class MenuActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         ipFragment = new IPFragment();
+        pingFragment = new PingFragment();
 
     }
 
@@ -53,33 +56,13 @@ public class MenuActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         if (id == R.id.nav_ip) {
             fragmentTransaction.replace(R.id.menucontainer, ipFragment);
+        } else if (id == R.id.nav_ping) {
+            fragmentTransaction.replace(R.id.menucontainer, pingFragment);
         } else if (id == R.id.nav_tracert) {
 
         } else if (id == R.id.nav_css) {
