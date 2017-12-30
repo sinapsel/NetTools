@@ -14,4 +14,6 @@
     <string name="pingingwait">---Please, wait---</string>
     <string name="number_of_packets">Number of packets:</string>
     <string name="ip_or_url">IP or url</string>
+    <string name="stop">Stop</string>
+    <string name="start">Start</string>
 </resources>

@@ -17,12 +17,14 @@ import android.view.MenuItem;
 
 import simapps.nettools.fragments.IPFragment;
 import simapps.nettools.fragments.PingFragment;
+import simapps.nettools.fragments.SockServerFragment;
 
 public class MenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     Fragment ipFragment;
     Fragment pingFragment;
+    Fragment scsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +44,7 @@ public class MenuActivity extends AppCompatActivity
 
         ipFragment = new IPFragment();
         pingFragment = new PingFragment();
-
+        scsFragment = new SockServerFragment();
     }
 
     @Override
@@ -63,10 +65,8 @@ public class MenuActivity extends AppCompatActivity
             fragmentTransaction.replace(R.id.menucontainer, ipFragment);
         } else if (id == R.id.nav_ping) {
             fragmentTransaction.replace(R.id.menucontainer, pingFragment);
-        } else if (id == R.id.nav_tracert) {
-
         } else if (id == R.id.nav_css) {
-
+            fragmentTransaction.replace(R.id.menucontainer, scsFragment);
         } else if (id == R.id.nav_csc) {
 
         } else if (id == R.id.nav_httpserver) {

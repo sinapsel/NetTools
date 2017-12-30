@@ -1,0 +1,35 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="simapps.nettools.fragments.SockServerFragment"
+    android:orientation="vertical">
+
+    <TextView
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:id="@+id/sockservconnectinfo"
+         android:textSize="26sp"/>
+
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="0.15"
+        android:checked="false"
+        android:textOn="@string/stop"
+        android:textOff="@string/start"/>
+
+    <EditText
+        android:id="@+id/servsocklog"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:cursorVisible="false"
+        android:focusable="false"
+        android:inputType="textMultiLine"
+        android:longClickable="false" />
+
+
+
+</LinearLayout>

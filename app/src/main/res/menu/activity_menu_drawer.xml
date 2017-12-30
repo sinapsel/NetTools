@@ -7,20 +7,19 @@
             android:title="@string/ip" />
         <item
             android:id="@+id/nav_ping"
-            android:title="Ping" />
-        <item
-            android:id="@+id/nav_tracert"
-            android:title="Traceroute" />
+            android:title="@string/ping" />
         <item
             android:id="@+id/nav_css"
-            android:title="Chat Socket Server" />
+            android:title="Socket Server" />
         <item
             android:id="@+id/nav_csc"
-            android:title="Chat Socket Client" />
-
+            android:title="Socket Client" />
         <item
             android:id="@+id/nav_httpserver"
             android:title="HTTP Server" />
+        <item
+            android:id="@+id/nav_sendquery"
+            android:title="Send query" />
     </group>
 
 </menu>
