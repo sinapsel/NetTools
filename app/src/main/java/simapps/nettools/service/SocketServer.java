@@ -9,23 +9,28 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public abstract class SocketServer extends Thread {
-    static final int HttpServerPORT = 8888;
-    HttpResponseThread httpResponseThread;
-    ServerSocket httpServerSocket;
-    String msgLog;
+    protected static final int HttpServerPORT = 8888;
+    private HttpResponseThread httpResponseThread;
+    private ServerSocket httpServerSocket;
+    protected String msgLog;
 
-    abstract void commitLog();
-    abstract void showConnectInfo();
+    public abstract void commitLog();
+    public abstract void showConnectInfo();
 
-    void destruct() {
+    public void destruct() {
         if (httpResponseThread != null && httpResponseThread.isAlive())
             httpResponseThread.interrupt();
+        try {
+            httpServerSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         this.interrupt();
     }
 
     @Override
     public void run() {
-        Socket socket = null;
+        //Socket socket = null;
         showConnectInfo();
         /*getActivity().runOnUiThread(new Runnable() {
             @Override
@@ -36,9 +41,8 @@ public abstract class SocketServer extends Thread {
         */
         try {
             httpServerSocket = new ServerSocket(HttpServerPORT);
-
             while (!this.isInterrupted()) {
-                socket = httpServerSocket.accept();
+                Socket socket = httpServerSocket.accept();
 
                 httpResponseThread =
                         new HttpResponseThread(
