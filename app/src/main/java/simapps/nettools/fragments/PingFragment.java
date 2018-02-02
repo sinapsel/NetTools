@@ -1,5 +1,6 @@
 package simapps.nettools.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -19,6 +20,7 @@ public class PingFragment extends Fragment {
     SeekBar seekbar;
     TextView packnum;
     EditText pingoutput;
+    private Bundle savedState = null;
     public PingFragment() {
         super();
     }
@@ -33,6 +35,15 @@ public class PingFragment extends Fragment {
         seekbar = view.findViewById(R.id.seekBar);
         packnum = view.findViewById(R.id.packnumnum);
         pingoutput = view.findViewById(R.id.pingoutput);
+        if(savedInstanceState !=null && savedState == null){
+            savedState = savedInstanceState.getBundle("STATE");
+        }
+        if(savedState != null){
+            pingip.setText(savedState.getString("IP"));
+            seekbar.setProgress(Integer.parseInt(savedState.getString("numOfPacks")));
+            pingoutput.setText(savedState.getString("IPLog"));
+        }
+        savedState = null;
         packnum.setText(getString(R.string.number_of_packets).concat(Integer.toString(seekbar.getProgress() + 1)));
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -60,5 +71,21 @@ public class PingFragment extends Fragment {
         });
         return view;
     }
-
+    private Bundle saveState(){
+        Bundle state = new Bundle();
+        state.putString("IP", pingip.getText().toString());
+        state.putString("numOfPacks", Integer.toString(seekbar.getProgress()));
+        state.putString("IPLog", pingoutput.getText().toString());
+        return state;
+    }
+    @Override
+    public void onDestroyView(){
+        super.onDestroyView();
+        savedState = saveState();
+    }
+    @Override
+    public void onSaveInstanceState(Bundle outState){
+        super.onSaveInstanceState(outState);
+        outState.putBundle("STATE", (savedState != null) ? savedState : saveState());
+    }
 }
