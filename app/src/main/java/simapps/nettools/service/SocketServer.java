@@ -9,6 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public abstract class SocketServer extends Thread {
+    public String response;
     protected static final int HttpServerPORT = 8888;
     private HttpResponseThread httpResponseThread;
     private ServerSocket httpServerSocket;
@@ -16,6 +17,11 @@ public abstract class SocketServer extends Thread {
 
     public abstract void commitLog();
     public abstract void showConnectInfo();
+
+    public SocketServer(String html){
+        super();
+        response = html;
+    }
 
     public void destruct() {
         if (httpResponseThread != null && httpResponseThread.isAlive())
@@ -80,12 +86,6 @@ public abstract class SocketServer extends Thread {
                 request = is.readLine();
 
                 os = new PrintWriter(socket.getOutputStream(), true);
-
-                String response =
-                        "<html><head></head>" +
-                                "<body>" +
-                                "<h1>" + h1 + "</h1>" +
-                                "</body></html>";
 
                 os.print("HTTP/1.0 200" + "\r\n");
                 os.print("Content type: text/html" + "\r\n");
