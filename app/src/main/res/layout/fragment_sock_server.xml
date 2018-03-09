@@ -17,7 +17,6 @@
             android:id="@+id/toggleButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="wrap_content"
             android:checked="false"
             android:textOn="@string/stop"
             android:textOff="@string/start"/>

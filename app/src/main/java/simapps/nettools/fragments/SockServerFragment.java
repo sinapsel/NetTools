@@ -30,7 +30,7 @@ public class SockServerFragment extends Fragment {
     EditText loggerEdit;
     TextView sockservconinfo;
     Button edithtmlbttn;
-    String html = "<html><head></head><body><h1>Seems to be working)</h1></body></html>";
+    String html = "<html>\n<head>\n<title>Compact webserver</title>\n</head>\n<body>\n<h1>Seems to be working)</h1>\n</body>\n</html>";
     private Bundle savedState = null;
 
 
@@ -94,13 +94,9 @@ public class SockServerFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), html_edit.class);
                 intent.putExtra("html", html);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         });
-
-        Intent intent = getActivity().getIntent();
-        if(intent.hasExtra("html"))
-            html = intent.getStringExtra("html");
 
         if(savedState != null){
             switcher.setChecked(savedState.getBoolean("Switch"));
@@ -114,6 +110,11 @@ public class SockServerFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (data == null) {return;}
+        html = data.getStringExtra("html");
+    }
 
 
     private Bundle saveState(){

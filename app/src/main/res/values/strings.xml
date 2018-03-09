@@ -16,5 +16,7 @@
     <string name="ip_or_url">IP or url</string>
     <string name="stop">Stop</string>
     <string name="start">Start</string>
-    <string name="title_activity_html_edit">html_edit</string>
+    <string name="title_activity_html_edit">Edit the webpage source coude</string>
+    <string name="pick_a_file">Pick a file</string>
+    <string name="done">Done</string>
 </resources>
