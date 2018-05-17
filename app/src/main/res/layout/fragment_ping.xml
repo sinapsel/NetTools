@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="simapps.nettools.fragments.PingFragment"
+    tools:context=".fragments.PingFragment"
     android:orientation="vertical">
 
     <EditText

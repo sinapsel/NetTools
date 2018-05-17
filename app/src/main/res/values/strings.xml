@@ -19,4 +19,16 @@
     <string name="title_activity_html_edit">Edit the webpage source coude</string>
     <string name="pick_a_file">Pick a file</string>
     <string name="done">Done</string>
+
+    <string name="no_connectivity">No connectivity</string>
+    <string name="no_text">Please enter an ip or URL</string>
+    <string name="no_ping">Incorect URL</string>
+    <string name="string_test">test</string>
+    <string name="error">An error occurred, please try again</string>
+    <string name="timeout">Timeout</string>
+    <string name="placeholder">www.google.com</string>
+    <string name="activity_button">Trace</string>
+    <string name="traceroute">Traceroute</string>
+    <string name="singleton_http_server">Singleton HTTP Server</string>
+
 </resources>
