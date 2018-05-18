@@ -30,5 +30,13 @@
     <string name="activity_button">Trace</string>
     <string name="traceroute">Traceroute</string>
     <string name="singleton_http_server">Singleton HTTP Server</string>
+    <string name="type_of_query">Type of query</string>
+    <string name="post">POST</string>
+    <string name="get">GET</string>
+    <string name="raw">RAW</string>
+    <string name="headers">Headers</string>
+    <string name="query_body">Query body</string>
+    <string name="send">Send</string>
+    <string name="connection_refused">Connection refused</string>
 
 </resources>

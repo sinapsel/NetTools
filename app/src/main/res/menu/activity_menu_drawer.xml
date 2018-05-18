@@ -15,11 +15,8 @@
             android:id="@+id/nav_css"
             android:title="@string/singleton_http_server" />
         <item
-            android:id="@+id/nav_httpserver"
-            android:title="HTTP Server" />
-        <item
             android:id="@+id/nav_sendquery"
-            android:title="Send query" />
+            android:title="Send a query" />
     </group>
 
 </menu>
