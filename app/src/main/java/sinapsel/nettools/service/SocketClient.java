@@ -1,8 +1,11 @@
 package sinapsel.nettools.service;
 
 import android.util.Log;
+
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
@@ -67,19 +70,24 @@ public abstract class SocketClient extends Thread {
     public void run() {
         try {
             Socket s = new Socket(IP.getHOST(), IP.getPORT());
-            InputStream in = s.getInputStream();
+            BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             OutputStream ou = s.getOutputStream();
             makeQuery();
             byte buf[] = query.getBytes();
             ou.write(buf);
             StringBuilder sb = new StringBuilder();
-            int c;
-            while ((c = in.read()) != -1) {
-                sb.append((char) c);
+            while(!(answ = in.readLine()).equals("")){
+                sb.append(answ.concat("\n"));
             }
             answ = sb.toString();
+//            int c;
+//            while ((c = in.read()) != -1) {
+//                sb.append((char) c);
+//            }
+//            answ = sb.toString();
+
         } catch (IOException e) {
-            answ = e.toString();
+            answ = "Invalid URL or Port";
             e.printStackTrace();
         }
         commit();

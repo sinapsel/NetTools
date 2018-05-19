@@ -5,6 +5,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="simapps.nettools.MenuActivity"
+    tools:context=".MenuActivity"
     tools:showIn="@layout/app_bar_menu"
-    android:id="@+id/menucontainer"/>
+    android:id="@+id/menucontainer">
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/catclick"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="4"
+            android:cropToPadding="false"
+            android:src="@drawable/hellocat" />
+
+        <TextView
+            android:id="@+id/clickmeannotation"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/swipe_menu_to_access_functions"
+            android:layout_gravity="center" />
+    </LinearLayout>
+</FrameLayout>

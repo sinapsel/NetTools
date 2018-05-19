@@ -27,7 +27,13 @@
         <activity
             android:name=".fragments.html_edit"
             android:label="@string/title_activity_html_edit"
-        android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <service
+            android:name=".SingletonHTTPServerService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":httpsingletonserver"/>
     </application>
 
 </manifest>

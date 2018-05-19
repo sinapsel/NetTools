@@ -2,6 +2,9 @@ package sinapsel.nettools.fragments;
 
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.app.Fragment;
 import android.view.LayoutInflater;
@@ -42,6 +45,7 @@ public class QueryFragment extends Fragment {
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                output.setText("");
                 String type = "";
                 if (raw.isChecked())
                     type="RAW";
@@ -49,6 +53,12 @@ public class QueryFragment extends Fragment {
                     type="GET";
                 if (post.isChecked())
                     type="POST";
+
+                ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo activeNetworkInfo = connectivityManager != null ? connectivityManager.getActiveNetworkInfo() : null;
+                if (!(activeNetworkInfo != null && activeNetworkInfo.isConnected()))
+                    Toast.makeText(getActivity().getApplicationContext(), getString(R.string.no_connectivity), Toast.LENGTH_SHORT).show();
+
 
                 new SocketClient(ip.getText().toString(), headers.getText().toString(),
                             body.getText().toString(), type, portfield.getText().toString()){

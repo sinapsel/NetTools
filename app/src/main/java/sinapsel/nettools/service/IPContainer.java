@@ -1,6 +1,5 @@
 /**
  * @author sinapsel
- * @version 1.2.1
  *
  * Class that stores IP parts
  *
@@ -31,6 +30,10 @@ public class IPContainer{
         ROUTE = ROUTE.replace(HOST, "");
     }
 
+    /**
+     * Constructor for default http 80 port
+     * @param addr is a full url or IP address with protocol and routes exclude port
+     */
     public IPContainer(String addr){
         if(addr.contains("http://"))
             addr = addr.replace("http://", "");
