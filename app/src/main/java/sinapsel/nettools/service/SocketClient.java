@@ -57,11 +57,11 @@ public abstract class SocketClient extends Thread {
         }
         if(qt == QType.GET){
             query = "GET "+IP.getROUTE()+" HTTP/1.1\r\n";
-            query += "Host: "+IP.getHOST()+"\r\n"+headers+body;
+            query += "Host: "+IP.getHOST()+"\r\n"+headers.replace("\n", "\r\n");
         }
         if(qt == QType.POST){
             query = "POST "+IP.getROUTE()+" HTTP/1.1\r\n";
-            query += "Host: "+IP.getHOST()+"\r\n"+headers+body;
+            query += "Host: "+IP.getHOST()+"\r\n"+headers.replace("\n", "\r\n")+body;
         }
         Log.d("SockCli", query);
     }
@@ -75,16 +75,14 @@ public abstract class SocketClient extends Thread {
             makeQuery();
             byte buf[] = query.getBytes();
             ou.write(buf);
+            ou.flush();
             StringBuilder sb = new StringBuilder();
-            while((answ = in.readLine()) != null && !answ.equals("")){
+            while(!(answ = in.readLine()).equals("")){
+                Log.d("SCC", answ);
+
                 sb.append(answ.concat("\n"));
             }
             answ = sb.toString();
-//            int c;
-//            while ((c = in.read()) != -1) {
-//                sb.append((char) c);
-//            }
-//            answ = sb.toString();
 
         } catch (IOException e) {
             answ = "Invalid URL or Port";

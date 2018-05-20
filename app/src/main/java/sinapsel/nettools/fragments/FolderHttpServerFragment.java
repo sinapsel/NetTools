@@ -106,8 +106,8 @@ public class FolderHttpServerFragment extends Fragment {
                     break;
                 case SingletonHTTPServerService.LOGUPD:
                     String[] list = ((Bundle)message.obj).getStringArray("text");
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                            android.R.layout.simple_list_item_1, list);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
+                            android.R.layout.simple_list_item_1, list != null ? list : new String[0]);
                     loggerEdit.setAdapter(adapter);
                     //HTTPServerSingletonFragment.this.loggerEdit.setText(((Bundle)message.obj).getString("text"));
                     break;

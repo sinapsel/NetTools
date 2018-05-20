@@ -77,7 +77,7 @@
         android:id="@+id/queryheaders"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/headers"
+        android:text="@string/defalt_header"
         android:inputType="textMultiLine"
         android:singleLine="true"
         android:visibility="visible" />
