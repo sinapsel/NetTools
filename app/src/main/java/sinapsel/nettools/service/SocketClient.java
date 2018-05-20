@@ -73,15 +73,21 @@ public abstract class SocketClient extends Thread {
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             OutputStream ou = s.getOutputStream();
             makeQuery();
-            byte buf[] = query.getBytes();
-            ou.write(buf);
+            for(String sss: query.split("\r\n")){
+                ou.write(sss.concat("\r\n").getBytes());
+            }
+            ou.write("\n\r".getBytes());
+            ou.flush();
+            ou.write("\r\n".getBytes());
             ou.flush();
             StringBuilder sb = new StringBuilder();
-            while(!(answ = in.readLine()).equals("")){
-                Log.d("SCC", answ);
-
-                sb.append(answ.concat("\n"));
+            String c;
+            Log.d("TAGG", "READ");
+            while((c = in.readLine()) != null){
+                Log.d("TAGG","READING  "+c);
+                sb.append(c.concat("\n"));
             }
+            Log.d("TAGG", "ReadED");
             answ = sb.toString();
 
         } catch (IOException e) {
