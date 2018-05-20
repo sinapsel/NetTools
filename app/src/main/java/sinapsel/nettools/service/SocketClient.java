@@ -76,7 +76,7 @@ public abstract class SocketClient extends Thread {
             byte buf[] = query.getBytes();
             ou.write(buf);
             StringBuilder sb = new StringBuilder();
-            while(!(answ = in.readLine()).equals("")){
+            while((answ = in.readLine()) != null && !answ.equals("")){
                 sb.append(answ.concat("\n"));
             }
             answ = sb.toString();

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ public class QueryFragment extends Fragment {
     EditText ip, headers, body, output, portfield;
     RadioButton raw, get, post;
     Button send;
+    ProgressBar pBar;
 
     public QueryFragment() {super();}
 
@@ -41,6 +43,7 @@ public class QueryFragment extends Fragment {
         post = view.findViewById(R.id.radioButton3);
         send = view.findViewById(R.id.sendquery);
         portfield = view.findViewById(R.id.portquery);
+        pBar = view.findViewById(R.id.pbarQuery);
 
         send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -59,22 +62,32 @@ public class QueryFragment extends Fragment {
                 if (!(activeNetworkInfo != null && activeNetworkInfo.isConnected()))
                     Toast.makeText(getActivity().getApplicationContext(), getString(R.string.no_connectivity), Toast.LENGTH_SHORT).show();
 
-
+                startProgressBar();
                 new SocketClient(ip.getText().toString(), headers.getText().toString(),
                             body.getText().toString(), type, portfield.getText().toString()){
                     @Override
                     public void commit(){
+
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 output.setText(answ);
+                                stopProgressBar();
                             }
                         });
+
                     }
                 }.start();
             }
         });
         return view;
+    }
+
+    public void startProgressBar() {
+        pBar.setVisibility(View.VISIBLE);
+    }
+    public void stopProgressBar() {
+        pBar.setVisibility(View.GONE);
     }
 
 }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NetTools</string>
+    <string name="app_name">laCAT</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -41,5 +41,7 @@
     <string name="defalt_header">User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\nAccept-Language: en-GB,en;q=0.5\r\nAccept-Encoding: gzip, deflate\r\nConnection: keep-alive\r\nCache-Control: max-age=0</string>
     <string name="swipe_menu_to_access_functions">Swipe menu or click me to access functions</string>
     <string name="edit_html">Edit HTML</string>
+    <string name="send_a_query">Send a query</string>
+    <string name="http_server_from_folder">HTTP Server from folder</string>
 
 </resources>

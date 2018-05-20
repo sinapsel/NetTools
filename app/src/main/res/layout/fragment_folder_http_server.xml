@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragments.FolderHttpServerFragment">
+
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/sockservconnectinfo"
+        android:textSize="26sp"/>
+    <EditText
+        android:id="@+id/route"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="/storage/emulated/0/" />
+        <ToggleButton
+            android:id="@+id/toggleButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:textOn="@string/stop"
+            android:textOff="@string/start"/>
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/servsocklog">
+
+    </ListView>
+
+
+
+
+</LinearLayout>
