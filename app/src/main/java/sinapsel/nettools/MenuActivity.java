@@ -47,12 +47,15 @@ public class MenuActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        //Fragments declaration
         ipFragment = new IPFragment();
         pingFragment = new PingFragment();
         scsFragment = new HTTPServerSingletonFragment();
         trsFragment = new TracerouteFragment();
         qryFragment = new QueryFragment();
         fhsFragment = new FolderHttpServerFragment();
+
+        //Cat opens drawer
         cat = findViewById(R.id.catclick);
         cat.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -62,6 +65,9 @@ public class MenuActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * If <- pressed on screen then show drawer else close
+     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -72,13 +78,18 @@ public class MenuActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Drawer menu selector
+     * @param item selected item from menu
+     * @return anyway true
+     */
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
         cat.setVisibility(View.INVISIBLE);
         findViewById(R.id.clickmeannotation).setVisibility(View.INVISIBLE);
-        if (id == R.id.nav_ip) {
+        if (id == R.id.nav_ip) { // i'd like to use switch here but don't want writing <<break>> every condition
             fragmentTransaction.replace(R.id.menucontainer, ipFragment);
         } else if (id == R.id.nav_ping) {
             fragmentTransaction.replace(R.id.menucontainer, pingFragment);

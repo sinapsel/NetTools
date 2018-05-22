@@ -18,7 +18,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import sinapsel.nettools.R;
-import sinapsel.nettools.service.SingletonHTTPServerService;
+import sinapsel.nettools.service.http.SingletonHTTPServerService;
 import sinapsel.nettools.service.GetIPAddress;
 
 public class HTTPServerSingletonFragment extends Fragment {

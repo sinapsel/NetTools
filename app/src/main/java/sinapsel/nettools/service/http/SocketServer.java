@@ -3,28 +3,34 @@
  *
  * Singleton HTTP Socket Server class
  */
-package sinapsel.nettools.service;
+package sinapsel.nettools.service.http;
 
+
+import android.util.Log;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.SQLOutput;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Date;
 
 public abstract class SocketServer extends Thread {
-    protected String response;
-    protected static final int HttpServerPORT = 8888;
+    private int HttpServerPORT;
     private HttpResponseThread httpResponseThread;
-    protected String request;
     private ServerSocket httpServerSocket;
+    private static final String TAG = "SOCKETSERVER";
+
+    protected Headers headers;
+    protected String content = "";
+    protected String path = "";
+
     protected String lastLog = "";
     protected ArrayList<String> msgLog = new ArrayList<>(40);
-
     /**
      * implement on fragment or activity to show server log up
      */
@@ -34,11 +40,13 @@ public abstract class SocketServer extends Thread {
      */
     public abstract void showConnectInfo();
 
-    public abstract String[] prepareResponse();
+    public abstract void readRequest(BufferedReader in) throws IOException;
+    public abstract void postResponse(Socket socket) throws IOException;
 
-    protected SocketServer(String html){
+    SocketServer(String html, int PORT){
         super();
-        response = html;
+        this.content = html;
+        HttpServerPORT = PORT;
     }
 
     public void destruct() {
@@ -47,7 +55,7 @@ public abstract class SocketServer extends Thread {
         try {
             httpServerSocket.close();
         } catch (NullPointerException e) {
-            System.out.println("Already closed");
+            Log.d(TAG, "Already closed");
         }
         catch (IOException e){
             e.printStackTrace();
@@ -57,15 +65,7 @@ public abstract class SocketServer extends Thread {
 
     @Override
     public void run() {
-        //Socket socket = null;
         showConnectInfo();
-        /*getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                sockservconinfo.setText(GetIPAddress.getIP().concat(":").concat(Integer.toString(HttpServerPORT)));
-            }
-        });
-        */
         try {
             httpServerSocket = new ServerSocket(HttpServerPORT);
             while (!this.isInterrupted()) {
@@ -77,10 +77,19 @@ public abstract class SocketServer extends Thread {
                 httpResponseThread.start();
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
+    }
+
+    public String getLastLog() {
+        return lastLog;
+    }
+    public int getPORT(){
+        return HttpServerPORT;
+    }
+    public ArrayList<String> getMsgLog() {
+        return msgLog;
     }
 
 
@@ -95,31 +104,12 @@ public abstract class SocketServer extends Thread {
         @Override
         public void run() {
             BufferedReader is;
-            PrintWriter os;
-            String request;
-
-
             try {
                 is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                StringBuilder sb = new StringBuilder();
-                while (!(request = is.readLine()).equals(""))
-                    sb.append(request.concat("\n"));
-                request = sb.toString();
-                SocketServer.this.request = request;
-                os = new PrintWriter(socket.getOutputStream(), true);
-
-                String[] resp = prepareResponse();
-                for (String i : resp){
-                    os.print(i.concat("\r\n"));
-                }
-                os.flush();
-
-                lastLog = "Request " + new Date().toString() + ":\n" +request
-                        + " from " + socket.getInetAddress().toString() + "\n";
-                msgLog.add(lastLog);
-                socket.close();
+                headers = new Headers();
+                readRequest(is);
+                postResponse(socket);
                 commitLog();
-
             } catch (Exception e) {
                 e.printStackTrace();
             }

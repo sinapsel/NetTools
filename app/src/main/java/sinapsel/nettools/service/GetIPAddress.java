@@ -6,6 +6,11 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 public class GetIPAddress {
+
+    /**
+     * Extracting local ip address with inetAddress
+     * @return IP in string
+     */
     public static String getIP() {
         String ip = "";
         try {

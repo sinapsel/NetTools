@@ -1,4 +1,4 @@
-package sinapsel.nettools.service;
+package sinapsel.nettools.service.http;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -18,13 +18,18 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 
 import sinapsel.nettools.R;
+import sinapsel.nettools.service.GetIPAddress;
 
 public class FolderHTTPService extends Service {
     public static final int BARUPD = 753;
@@ -34,6 +39,8 @@ public class FolderHTTPService extends Service {
     protected SocketServer httpServerThread;
     private String LastLog = "";
     protected int num = 0;
+
+    private boolean isIMG = false;
 
     private Messenger messageHandler;
     public FolderHTTPService() {
@@ -94,7 +101,7 @@ public class FolderHTTPService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand");
+        Log.d(TAG, "onStartCommand()");
         if (intent != null) {
             if (intent.hasExtra("start")) {
                 messageHandler = (Messenger) intent.getExtras().get("messenger");
@@ -102,8 +109,8 @@ public class FolderHTTPService extends Service {
                 smain();
             } else {
                 if(messageHandler != null)
-                    sendMessage(BARUPD,new Object[]{});
-                Log.d(TAG, "killing");
+                    sendMessage(BARUPD, new Object[]{});
+                Log.d(TAG, "stoping service");
                 stopSelf();
             }
         }
@@ -112,74 +119,116 @@ public class FolderHTTPService extends Service {
 
     public void smain() {
         Log.d(TAG, "thread started");
-        httpServerThread = new SocketServer("") {
+        httpServerThread = new SocketServer("", 7777) {
             @Override
             public void commitLog() {
-                LastLog = lastLog;
+                LastLog = getLastLog();
                 num++;
                 sendNotification();
-                sendMessage(LOGUPD, msgLog.toArray());
-                Log.d(TAG, lastLog);
+                sendMessage(LOGUPD, getMsgLog().toArray());
+                Log.d(TAG, getLastLog());
             }
 
             @Override
             public void showConnectInfo() {
-                sendMessage(BARUPD, new Object[]{GetIPAddress.getIP().concat(":").concat(Integer.toString(HttpServerPORT))});
+                sendMessage(BARUPD, new Object[]{GetIPAddress.getIP().concat(":")
+                        .concat(Integer.toString(getPORT()))});
+            }
+
+
+            @Override
+            public void readRequest(BufferedReader in) throws IOException {
+                Log.d(TAG, "readRequest");
+                String firstLine = in.readLine();
+                Log.d(TAG, "firstLine: " + firstLine);
+                String method = firstLine.split(" ")[0];
+                path = firstLine.split(" ")[1];
+                if (path.isEmpty() || (path.charAt(path.length() - 1) == '/'))
+                    path = "/index.html";
+                Log.d(TAG, "Path: "+path);
+                String ext = path.split("\\.")[path.split("\\.").length - 1]
+                        .toUpperCase();
+                Log.d(TAG, ext);
+                lastLog = firstLine;
+                if (!(method.equals("GET") || method.equals("POST"))){
+                    headers.setHTTP_Status("ERR400");
+                    headers.setContent_type("HTML");
+                    content = "<h1>Error 400</h1> - bad request";
+                    headers.setLength(content.length());
+                    return;
+                }
+                else if (!Environment.getExternalStorageState().equals(
+                        Environment.MEDIA_MOUNTED)) {
+                    Log.d("FILEREADER", "SD-карта не доступна: " + Environment.getExternalStorageState());
+                    headers.setHTTP_Status("ERR403");
+                    headers.setContent_type("HTML");
+                    content = "<h1>Error 403</h1> - permission denied";
+                    headers.setLength(content.length());
+                    return;
+                }
+                else if (!(new File(Environment.getExternalStorageDirectory(), BASE_ROUTE.concat(path).
+                        replace(Environment.getExternalStorageDirectory().
+                                getAbsolutePath(), ""))).exists()) {
+                    headers.setHTTP_Status("ERR404");
+                    headers.setContent_type("HTML");
+                    content = "<h1>Error 404</h1> - not found";
+                    headers.setLength(content.length());
+                    Log.d(TAG, "MOT FOUND!");
+                    return;
+                }
+                headers.setHTTP_Status("OK200");
+                if(!Arrays.asList(MIME.values()).contains(ext)){
+                    ext = "OTHER";
+                }
+                headers.setContent_type(ext);
+                if (Arrays.asList(new MIME[]{MIME.JPEG, MIME.JPG, MIME.PNG, MIME.GIF, MIME.ICO})
+                        .contains(headers.getContent_type())){
+                    isIMG = true;
+                }
             }
 
             @Override
-            public String[] prepareResponse() {
-                String R = request.split("\r\n")[0].split(" ")[1];
-                if ((R.charAt(R.length() - 1)) == '/')
-                    R += "index.html";
-                ArrayList<String> al = new ArrayList<>(4);
-                String src;
-                StringBuilder sb = new StringBuilder();
-                if (!Environment.getExternalStorageState().equals(
-                        Environment.MEDIA_MOUNTED)) {
-                    Log.d("FILEREADER", "SD-карта не доступна: " + Environment.getExternalStorageState());
-                    return new String[]{""};
-                }
-                if(!request.split("\r\n")[0].split(" ")[0].equals("GET")){
-                    src = "Error 406 - BAD Query";
-                    al.add("HTTP/1.0 406");
-                    al.add("Content type: text/html");
-                    al.add("Content length:" + src.length());
-                    al.add("");
-                    al.add(src);
-                    return Arrays.copyOf(al.toArray(), al.size(), String[].class);
-                }
+            public void postResponse(Socket socket) throws IOException {
+                lastLog += " from " + socket.getInetAddress().toString() + " at " + new Date().toString();
+                msgLog.add(lastLog);
+                Log.d(TAG, headers.toString());
                 File sdPath = Environment.getExternalStorageDirectory();
-                File sdFile = new File(sdPath, BASE_ROUTE.concat(R).replace(sdPath.getAbsolutePath(), ""));
-                try {
-                    BufferedReader br = new BufferedReader(new FileReader(sdFile));
-                    String str = "";
-                    while ((str = br.readLine()) != null) {
-                        sb.append(str);
+                File sdFile = new File(sdPath, BASE_ROUTE.concat(path).
+                        replace(sdPath.getAbsolutePath(), ""));
+                if(isIMG){
+                    FileInputStream is = new FileInputStream(sdFile);
+                    OutputStream os = socket.getOutputStream();
+                    int a;
+                    headers.setLength(is.available());
+                    for (char c : headers.toString().toCharArray()) {
+                        os.write(c);
                     }
-                    src = sb.toString();
-                    al.add("HTTP/1.0 200");
-                    al.add("Content type: text/html");
-                    al.add("Content length:" + src.length());
-                    al.add("");
-                    al.add(src);
-                } catch (FileNotFoundException e) {
-                        src = "Error 404 - File Not Found";
-                        al.add("HTTP/1.0 404");
-                        al.add("Content type: text/html");
-                        al.add("Content length:" + src.length());
-                        al.add("");
-                        al.add(src);
-                } catch (IOException e) {
-                    src = "Error 403 - Access Denied";
-                    al.add("HTTP/1.0 403");
-                    al.add("Content type: text/html");
-                    al.add("Content length:" + src.length());
-                    al.add("");
-                    al.add(src);
+                    os.write("\r\n".getBytes());
+                    while ((a = is.read()) > -1) {
+                        os.write(a);
+                    }
+                    os.flush();
+                    is.close();
+                    os.close();
                 }
-
-                return Arrays.copyOf(al.toArray(), al.size(), String[].class);
+                else {
+                    PrintWriter pw = new PrintWriter(socket.getOutputStream());
+                    if(content.isEmpty()){
+                        BufferedReader br = new BufferedReader(new FileReader(sdFile));
+                        String str = "";
+                        StringBuilder sb = new StringBuilder();
+                        while ((str = br.readLine()) != null) {
+                            sb.append(str);
+                        }
+                        content = sb.toString();
+                        Log.d(TAG, content);
+                    }
+                    headers.setLength(content.length());
+                    pw.write(headers.toString());
+                    pw.write("\r\n");
+                    pw.write(content);
+                    pw.close();
+                }
             }
         };
         if (!httpServerThread.isAlive())
@@ -208,4 +257,6 @@ public class FolderHTTPService extends Service {
             e.printStackTrace();
         }
     }
+
+
 }

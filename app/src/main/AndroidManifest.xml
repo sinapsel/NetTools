@@ -30,12 +30,12 @@
             android:theme="@style/AppTheme.NoActionBar" />
 
         <service
-            android:name=".service.SingletonHTTPServerService"
+            android:name=".service.http.SingletonHTTPServerService"
             android:enabled="true"
             android:exported="true"
             android:process=":httpsingletonserver" />
         <service
-            android:name=".service.FolderHTTPService"
+            android:name=".service.http.FolderHTTPService"
             android:enabled="true"
             android:exported="true"
             android:process=":httpfolderserver"/>

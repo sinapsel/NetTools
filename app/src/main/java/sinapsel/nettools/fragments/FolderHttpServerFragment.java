@@ -1,5 +1,6 @@
 package sinapsel.nettools.fragments;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,8 +17,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import sinapsel.nettools.R;
-import sinapsel.nettools.service.FolderHTTPService;
-import sinapsel.nettools.service.SingletonHTTPServerService;
+import sinapsel.nettools.service.http.FolderHTTPService;
+import sinapsel.nettools.service.http.SingletonHTTPServerService;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -27,7 +28,6 @@ public class FolderHttpServerFragment extends Fragment {
     public ListView loggerEdit;
     public TextView sockservconinfo;
     EditText editroute;
-    private Bundle savedState = null;
     public Handler messageHandler = new FolderHttpServerFragment.MessageHandler();
     public FolderHttpServerFragment() {
         super();
@@ -53,13 +53,15 @@ public class FolderHttpServerFragment extends Fragment {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if(b){
+                    //starting service
                     getActivity().startService(new Intent(getActivity(),
                             FolderHTTPService.class).putExtra("start", 1)
                             .putExtra("baseroute", editroute.getText().toString())
                             .putExtra("messenger", new Messenger(messageHandler)));
                 }else {
+                    //stopping service
                     getActivity().stopService(new Intent(getActivity(), FolderHTTPService.class));
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                    ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(),
                             android.R.layout.simple_list_item_1, new String[] {});
                     loggerEdit.setAdapter(adapter);
                 }
@@ -67,6 +69,7 @@ public class FolderHttpServerFragment extends Fragment {
             }
         });
 
+        //directory picker
         editroute.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -97,6 +100,7 @@ public class FolderHttpServerFragment extends Fragment {
         }
     }
 
+    @SuppressLint("HandlerLeak")
     public class MessageHandler extends Handler {
         @Override
         public void handleMessage(Message message) {
