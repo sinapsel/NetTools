@@ -40,7 +40,7 @@ public class FolderHTTPService extends Service {
     private String LastLog = "";
     protected int num = 0;
 
-    private boolean isIMG = false;
+    private boolean isIMG;
 
     private Messenger messageHandler;
     public FolderHTTPService() {
@@ -148,8 +148,10 @@ public class FolderHTTPService extends Service {
                 Log.d(TAG, "Path: "+path);
                 String ext = path.split("\\.")[path.split("\\.").length - 1]
                         .toUpperCase();
-                Log.d(TAG, ext);
+                Log.d(TAG, "RAW Ext: " + ext);
                 lastLog = firstLine;
+                headers = new Headers();
+                content = "";
                 if (!(method.equals("GET") || method.equals("POST"))){
                     headers.setHTTP_Status("ERR400");
                     headers.setContent_type("HTML");
@@ -173,25 +175,27 @@ public class FolderHTTPService extends Service {
                     headers.setContent_type("HTML");
                     content = "<h1>Error 404</h1> - not found";
                     headers.setLength(content.length());
-                    Log.d(TAG, "MOT FOUND!");
+                    Log.d(TAG, "NOT FOUND!");
                     return;
                 }
-                headers.setHTTP_Status("OK200");
-                if(!Arrays.asList(MIME.values()).contains(ext)){
-                    ext = "OTHER";
+                else {
+                    headers.setHTTP_Status("OK200");
+                    if (!Arrays.asList(MIME.values()).contains(ext)) ext = "OTHER";
+                    headers.setContent_type(ext);
+                    if (Arrays.asList(new MIME[]{MIME.JPEG, MIME.JPG, MIME.PNG, MIME.GIF, MIME.ICO})
+                            .contains(headers.getContent_type())) {
+                        isIMG = true;
+                    }
+                    else isIMG = false;
                 }
-                headers.setContent_type(ext);
-                if (Arrays.asList(new MIME[]{MIME.JPEG, MIME.JPG, MIME.PNG, MIME.GIF, MIME.ICO})
-                        .contains(headers.getContent_type())){
-                    isIMG = true;
-                }
+                Log.d(TAG, headers.toString());
+                Log.d(TAG, (content.isEmpty() ? "NO CONTENT YET" : content));
             }
 
             @Override
             public void postResponse(Socket socket) throws IOException {
                 lastLog += " from " + socket.getInetAddress().toString() + " at " + new Date().toString();
                 msgLog.add(lastLog);
-                Log.d(TAG, headers.toString());
                 File sdPath = Environment.getExternalStorageDirectory();
                 File sdFile = new File(sdPath, BASE_ROUTE.concat(path).
                         replace(sdPath.getAbsolutePath(), ""));
@@ -203,7 +207,7 @@ public class FolderHTTPService extends Service {
                     for (char c : headers.toString().toCharArray()) {
                         os.write(c);
                     }
-                    os.write("\r\n".getBytes());
+                    os.write('\r'); os.write('\n');
                     while ((a = is.read()) > -1) {
                         os.write(a);
                     }
@@ -218,7 +222,7 @@ public class FolderHTTPService extends Service {
                         String str = "";
                         StringBuilder sb = new StringBuilder();
                         while ((str = br.readLine()) != null) {
-                            sb.append(str);
+                            sb.append(str.concat("\n"));
                         }
                         content = sb.toString();
                         Log.d(TAG, content);

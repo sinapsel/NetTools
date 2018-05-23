@@ -132,6 +132,10 @@ public class Headers {
         return Content_type;
     }
 
+    public void reset(){
+
+    }
+
     @Override
     public String toString(){
         return HTTP_Status.toString() + Content_type.toString()

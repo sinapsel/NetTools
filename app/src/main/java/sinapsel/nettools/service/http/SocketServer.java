@@ -26,7 +26,7 @@ public abstract class SocketServer extends Thread {
     private static final String TAG = "SOCKETSERVER";
 
     protected Headers headers;
-    protected String content = "";
+    protected String content;
     protected String path = "";
 
     protected String lastLog = "";
@@ -106,7 +106,6 @@ public abstract class SocketServer extends Thread {
             BufferedReader is;
             try {
                 is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                headers = new Headers();
                 readRequest(is);
                 postResponse(socket);
                 commitLog();
