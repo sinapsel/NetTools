@@ -1,10 +1,4 @@
-/**
- * @author sinapsel
- *
- * Singleton HTTP Socket Server class
- */
 package sinapsel.nettools.service.http;
-
 
 import android.util.Log;
 
@@ -19,14 +13,20 @@ import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * @author sinapsel
+ *
+ * Socket Server class
+ */
 public abstract class SocketServer extends Thread {
     protected int HttpServerPORT;
-    //private Thread httpResponseThread;
     protected ServerSocket httpServerSocket;
-    private static final String TAG = "SOCKETSERVER";
     protected String static_content;
 
     protected ArrayList<String> msgLog = new ArrayList<>(40);
+    /**
+     * Protection from garbage cleaner
+     */
     public ArrayList<Socket> SocketSaver = new ArrayList<>(15);
 
    /**
@@ -34,7 +34,7 @@ public abstract class SocketServer extends Thread {
      */
     public abstract void showConnectInfo();
     /**
-     *
+     * @param static_content responsing default value
      * @param PORT server port
      */
     SocketServer(String static_content, int PORT){
@@ -64,6 +64,10 @@ public abstract class SocketServer extends Thread {
          * @throws IOException so we have common try..catch block around call of this method
          */
         public abstract void postResponse(Socket socket) throws IOException;
+
+        /**
+         * implement on service, changes will be shown with message handlers on UI
+         */
         public abstract void commitLog();
 
         Socket socket;

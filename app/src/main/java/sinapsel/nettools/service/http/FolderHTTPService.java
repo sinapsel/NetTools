@@ -186,7 +186,6 @@ public class FolderHTTPService extends Service {
                                             MIME.ICO}).contains(headers.getContent_type());
                                 }
                                 Log.d(TAG, headers.toString());
-                                Log.d(TAG, (content.isEmpty() ? "NO CONTENT YET" : content));
                             }
 
                             @Override
@@ -216,7 +215,7 @@ public class FolderHTTPService extends Service {
                                     PrintWriter pw = new PrintWriter(socket.getOutputStream());
                                     if(content.isEmpty()){
                                         BufferedReader br = new BufferedReader(new FileReader(sdFile));
-                                        String str = "";
+                                        String str;
                                         StringBuilder sb = new StringBuilder();
                                         while ((str = br.readLine()) != null) {
                                             sb.append(str.concat("\n"));
