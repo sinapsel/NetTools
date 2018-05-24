@@ -21,8 +21,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,9 +85,7 @@ public class FolderHTTPService extends Service {
     public void onDestroy() {
         super.onDestroy();
         if (httpServerThread != null)
-            httpServerThread.destruct();
-        assert httpServerThread != null;
-        httpServerThread.interrupt();
+            httpServerThread.interrupt();
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         if (notificationManager != null) {
@@ -121,118 +121,156 @@ public class FolderHTTPService extends Service {
         Log.d(TAG, "thread started");
         httpServerThread = new SocketServer("", 7777) {
             @Override
-            public void commitLog() {
-                LastLog = getLastLog();
-                num++;
-                sendNotification();
-                sendMessage(LOGUPD, getMsgLog().toArray());
-                Log.d(TAG, getLastLog());
+            public void run(){
+                showConnectInfo();
+                try {
+                    httpServerSocket = new ServerSocket(HttpServerPORT);
+                    while (!this.isInterrupted()){
+                        Socket socket = httpServerSocket.accept();
+                        SocketSaver.add(socket);
+                        new Thread(new HttpResponseHandler(socket) {
+                            @Override
+                            public void readRequest(BufferedReader in) throws IOException {
+                                Log.d(TAG, "readRequest");
+                                String firstLine = in.readLine();
+                                Log.d(TAG, "firstLine: " + firstLine);
+                                String method = firstLine.split(" ")[0];
+                                path = firstLine.split(" ")[1];
+                                if (path.isEmpty() || (path.charAt(path.length() - 1) == '/'))
+                                    path += "/index.html";
+                                path = path.split("\\?")[0];
+                                Log.d(TAG, "Path: "+path);
+                                String ext = path.split("\\.")[path.split("\\.").length - 1]
+                                        .toUpperCase();
+                                Log.d(TAG, "RAW Ext: " + ext);
+                                lastLog = firstLine;
+                                headers = new Headers();
+                                content = "";
+                                isIMG = false;
+                                if (!(method.equals("GET") || method.equals("POST"))){
+                                    headers.setHTTP_Status("ERR400");
+                                    headers.setContent_type("HTML");
+                                    content = "<h1>Error 400</h1> - bad request";
+                                    headers.setLength(content.length());
+                                }
+                                else if (!Environment.getExternalStorageState().equals(
+                                        Environment.MEDIA_MOUNTED)) {
+                                    Log.d("FILEREADER", "SD-карта не доступна: " + Environment.getExternalStorageState());
+                                    headers.setHTTP_Status("ERR403");
+                                    headers.setContent_type("HTML");
+                                    content = "<h1>Error 403</h1> - permission denied";
+                                    headers.setLength(content.length());
+                                }
+                                else if (!(new File(Environment.getExternalStorageDirectory(), BASE_ROUTE.concat(path).
+                                        replace(Environment.getExternalStorageDirectory().
+                                                getAbsolutePath(), ""))).exists()) {
+                                    headers.setHTTP_Status("ERR404");
+                                    headers.setContent_type("HTML");
+                                    content = "<h1>Error 404</h1> - not found";
+                                    headers.setLength(content.length());
+                                    Log.d(TAG, "NOT FOUND!");
+                                }
+                                else {
+                                    headers.setHTTP_Status("OK200");
+                                    boolean isMimed = false;
+                                    for (MIME mime : MIME.values()){
+                                        if (ext.equals(mime.name())){
+                                            isMimed = true;
+                                            Log.d(TAG, mime.name());
+                                        }
+                                    }
+                                    if (!isMimed)
+                                        ext = "OTHER";
+                                    headers.setContent_type(ext);
+                                    isIMG = Arrays.asList(new MIME[]{MIME.JPEG, MIME.JPG, MIME.PNG, MIME.GIF,
+                                            MIME.ICO}).contains(headers.getContent_type());
+                                }
+                                Log.d(TAG, headers.toString());
+                                Log.d(TAG, (content.isEmpty() ? "NO CONTENT YET" : content));
+                            }
+
+                            @Override
+                            public void postResponse(Socket socket) throws IOException {
+                                lastLog += " from " + socket.getInetAddress().toString() + " at " + new Date().toString();
+                                msgLog.add(lastLog);
+                                File sdPath = Environment.getExternalStorageDirectory();
+                                File sdFile = new File(sdPath, BASE_ROUTE.concat(path).
+                                        replace(sdPath.getAbsolutePath(), ""));
+                                if(isIMG){
+                                    FileInputStream is = new FileInputStream(sdFile);
+                                    OutputStream os = socket.getOutputStream();
+                                    int a;
+                                    headers.setLength(is.available());
+                                    for (char c : headers.toString().toCharArray()) {
+                                        os.write(c);
+                                    }
+                                    os.write('\r'); os.write('\n');
+                                    while ((a = is.read()) > -1) {
+                                        os.write(a);
+                                    }
+                                    os.flush();
+                                    is.close();
+                                    os.close();
+                                }
+                                else {
+                                    PrintWriter pw = new PrintWriter(socket.getOutputStream());
+                                    if(content.isEmpty()){
+                                        BufferedReader br = new BufferedReader(new FileReader(sdFile));
+                                        String str = "";
+                                        StringBuilder sb = new StringBuilder();
+                                        while ((str = br.readLine()) != null) {
+                                            sb.append(str.concat("\n"));
+                                        }
+                                        br.close();
+                                        content = sb.toString();
+                                        Log.d(TAG, content);
+                                    }
+                                    headers.setLength(content.length());
+                                    pw.write(headers.toString());
+                                    pw.write("\r\n");
+                                    pw.write(content);
+                                    pw.close();
+                                }
+                            }
+                            @Override
+                            public void run() {
+                                BufferedReader is;
+                                try {
+                                    is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                                    readRequest(is);
+                                    postResponse(socket);
+                                    commitLog();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                                finally {
+                                    try{
+                                        socket.close();
+                                    }catch (IOException e){
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void commitLog() {
+                                LastLog = lastLog;
+                                num++;
+                                sendNotification();
+                                sendMessage(LOGUPD, getMsgLog().toArray());
+                                Log.d(TAG, lastLog);
+                            }
+                        }).start();
+                    }
+                } catch (IOException e){
+                    e.printStackTrace();
+                }
             }
 
             @Override
             public void showConnectInfo() {
                 sendMessage(BARUPD, new Object[]{GetIPAddress.getIP().concat(":")
                         .concat(Integer.toString(getPORT()))});
-            }
-
-
-            @Override
-            public void readRequest(BufferedReader in) throws IOException {
-                Log.d(TAG, "readRequest");
-                String firstLine = in.readLine();
-                Log.d(TAG, "firstLine: " + firstLine);
-                String method = firstLine.split(" ")[0];
-                path = firstLine.split(" ")[1];
-                if (path.isEmpty() || (path.charAt(path.length() - 1) == '/'))
-                    path = "/index.html";
-                Log.d(TAG, "Path: "+path);
-                String ext = path.split("\\.")[path.split("\\.").length - 1]
-                        .toUpperCase();
-                Log.d(TAG, "RAW Ext: " + ext);
-                lastLog = firstLine;
-                headers = new Headers();
-                content = "";
-                if (!(method.equals("GET") || method.equals("POST"))){
-                    headers.setHTTP_Status("ERR400");
-                    headers.setContent_type("HTML");
-                    content = "<h1>Error 400</h1> - bad request";
-                    headers.setLength(content.length());
-                    return;
-                }
-                else if (!Environment.getExternalStorageState().equals(
-                        Environment.MEDIA_MOUNTED)) {
-                    Log.d("FILEREADER", "SD-карта не доступна: " + Environment.getExternalStorageState());
-                    headers.setHTTP_Status("ERR403");
-                    headers.setContent_type("HTML");
-                    content = "<h1>Error 403</h1> - permission denied";
-                    headers.setLength(content.length());
-                    return;
-                }
-                else if (!(new File(Environment.getExternalStorageDirectory(), BASE_ROUTE.concat(path).
-                        replace(Environment.getExternalStorageDirectory().
-                                getAbsolutePath(), ""))).exists()) {
-                    headers.setHTTP_Status("ERR404");
-                    headers.setContent_type("HTML");
-                    content = "<h1>Error 404</h1> - not found";
-                    headers.setLength(content.length());
-                    Log.d(TAG, "NOT FOUND!");
-                    return;
-                }
-                else {
-                    headers.setHTTP_Status("OK200");
-                    if (!Arrays.asList(MIME.values()).contains(ext)) ext = "OTHER";
-                    headers.setContent_type(ext);
-                    if (Arrays.asList(new MIME[]{MIME.JPEG, MIME.JPG, MIME.PNG, MIME.GIF, MIME.ICO})
-                            .contains(headers.getContent_type())) {
-                        isIMG = true;
-                    }
-                    else isIMG = false;
-                }
-                Log.d(TAG, headers.toString());
-                Log.d(TAG, (content.isEmpty() ? "NO CONTENT YET" : content));
-            }
-
-            @Override
-            public void postResponse(Socket socket) throws IOException {
-                lastLog += " from " + socket.getInetAddress().toString() + " at " + new Date().toString();
-                msgLog.add(lastLog);
-                File sdPath = Environment.getExternalStorageDirectory();
-                File sdFile = new File(sdPath, BASE_ROUTE.concat(path).
-                        replace(sdPath.getAbsolutePath(), ""));
-                if(isIMG){
-                    FileInputStream is = new FileInputStream(sdFile);
-                    OutputStream os = socket.getOutputStream();
-                    int a;
-                    headers.setLength(is.available());
-                    for (char c : headers.toString().toCharArray()) {
-                        os.write(c);
-                    }
-                    os.write('\r'); os.write('\n');
-                    while ((a = is.read()) > -1) {
-                        os.write(a);
-                    }
-                    os.flush();
-                    is.close();
-                    os.close();
-                }
-                else {
-                    PrintWriter pw = new PrintWriter(socket.getOutputStream());
-                    if(content.isEmpty()){
-                        BufferedReader br = new BufferedReader(new FileReader(sdFile));
-                        String str = "";
-                        StringBuilder sb = new StringBuilder();
-                        while ((str = br.readLine()) != null) {
-                            sb.append(str.concat("\n"));
-                        }
-                        content = sb.toString();
-                        Log.d(TAG, content);
-                    }
-                    headers.setLength(content.length());
-                    pw.write(headers.toString());
-                    pw.write("\r\n");
-                    pw.write(content);
-                    pw.close();
-                }
             }
         };
         if (!httpServerThread.isAlive())
@@ -261,6 +299,4 @@ public class FolderHTTPService extends Service {
             e.printStackTrace();
         }
     }
-
-
 }

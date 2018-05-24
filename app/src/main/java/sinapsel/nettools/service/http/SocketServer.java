@@ -20,71 +20,29 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public abstract class SocketServer extends Thread {
-    private int HttpServerPORT;
-    private HttpResponseThread httpResponseThread;
-    private ServerSocket httpServerSocket;
+    protected int HttpServerPORT;
+    //private Thread httpResponseThread;
+    protected ServerSocket httpServerSocket;
     private static final String TAG = "SOCKETSERVER";
+    protected String static_content;
 
-    protected Headers headers;
-    protected String content;
-    protected String path = "";
-
-    protected String lastLog = "";
     protected ArrayList<String> msgLog = new ArrayList<>(40);
-    /**
-     * implement on fragment or activity to show server log up
-     */
-    public abstract void commitLog();
-    /**
+    public ArrayList<Socket> SocketSaver = new ArrayList<>(15);
+
+   /**
      * implement on fragment or activity to show server connection info
      */
     public abstract void showConnectInfo();
-
-    public abstract void readRequest(BufferedReader in) throws IOException;
-    public abstract void postResponse(Socket socket) throws IOException;
-
-    SocketServer(String html, int PORT){
+    /**
+     *
+     * @param PORT server port
+     */
+    SocketServer(String static_content, int PORT){
         super();
-        this.content = html;
+        this.static_content = static_content;
         HttpServerPORT = PORT;
     }
 
-    public void destruct() {
-        if (httpResponseThread != null && httpResponseThread.isAlive())
-            httpResponseThread.interrupt();
-        try {
-            httpServerSocket.close();
-        } catch (NullPointerException e) {
-            Log.d(TAG, "Already closed");
-        }
-        catch (IOException e){
-            e.printStackTrace();
-        }
-        this.interrupt();
-    }
-
-    @Override
-    public void run() {
-        showConnectInfo();
-        try {
-            httpServerSocket = new ServerSocket(HttpServerPORT);
-            while (!this.isInterrupted()) {
-                Socket socket = httpServerSocket.accept();
-
-                httpResponseThread =
-                        new HttpResponseThread(
-                                socket);
-                httpResponseThread.start();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public String getLastLog() {
-        return lastLog;
-    }
     public int getPORT(){
         return HttpServerPORT;
     }
@@ -93,25 +51,29 @@ public abstract class SocketServer extends Thread {
     }
 
 
-    private class HttpResponseThread extends Thread {
+    protected abstract class HttpResponseHandler implements Runnable {
+        /**
+         * implement on service to put outcome data
+         * @param in buffered reader which is wrappering input stream of socket
+         * @throws IOException so we have common try..catch block around call of this method
+         */
+        public abstract void readRequest(BufferedReader in) throws IOException;
+        /**
+         * implement on service to put outcome data
+         * @param socket need for extracting different wrappers of output stream and log info
+         * @throws IOException so we have common try..catch block around call of this method
+         */
+        public abstract void postResponse(Socket socket) throws IOException;
+        public abstract void commitLog();
 
         Socket socket;
+        protected Headers headers;
+        protected String content;
+        protected String path;
+        protected String lastLog = "";
 
-        HttpResponseThread(Socket socket) {
+        HttpResponseHandler(Socket socket) {
             this.socket = socket;
-        }
-
-        @Override
-        public void run() {
-            BufferedReader is;
-            try {
-                is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                readRequest(is);
-                postResponse(socket);
-                commitLog();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 }

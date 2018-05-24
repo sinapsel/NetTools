@@ -114,6 +114,10 @@ public class Headers {
         HTTP_Status = HTTP_STATUS.valueOf(stat);
         Length = new LENGTH(len);
     }
+
+    /**
+     * DEFAULT SETS
+     */
     Headers(){
         Connection = CONNECTION.CLOSE;
         Length = new LENGTH(0);
