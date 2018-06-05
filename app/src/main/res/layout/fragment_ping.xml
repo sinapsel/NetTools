@@ -10,11 +10,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/ip_or_url"
+        android:inputType="textUri"
         android:maxLines="1" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/pingbutton"
@@ -45,8 +47,13 @@
 
         </LinearLayout>
 
-    </LinearLayout>
 
+    </LinearLayout>
+    <ProgressBar
+        android:id="@+id/pBarPing"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="match_parent"

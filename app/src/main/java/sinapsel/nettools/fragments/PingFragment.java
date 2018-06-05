@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -19,8 +20,10 @@ public class PingFragment extends Fragment {
     Button pingbutton;
     SeekBar seekbar;
     TextView packnum;
+    ProgressBar pb;
     EditText pingoutput;
     private Bundle savedState = null;
+    String out;
     public PingFragment() {
         super();
     }
@@ -35,6 +38,7 @@ public class PingFragment extends Fragment {
         seekbar = view.findViewById(R.id.seekBar);
         packnum = view.findViewById(R.id.packnumnum);
         pingoutput = view.findViewById(R.id.pingoutput);
+        pb = view.findViewById(R.id.pBarPing);
         if(savedInstanceState !=null && savedState == null){
             savedState = savedInstanceState.getBundle("STATE");
         }
@@ -65,8 +69,21 @@ public class PingFragment extends Fragment {
         pingbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pingoutput.setText(getString(R.string.pingingwait));
-                pingoutput.setText(Ping.ping(seekbar.getProgress() + 1, new IPContainer(pingip.getText().toString())));
+                pb.setVisibility(View.VISIBLE);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        out = (Ping.ping(seekbar.getProgress() + 1, new IPContainer(pingip.getText().toString())));
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                pb.setVisibility(View.GONE);
+                                pingoutput.setText(out);
+                            }
+                        });
+                    }
+                }).start();
+
             }
         });
         return view;

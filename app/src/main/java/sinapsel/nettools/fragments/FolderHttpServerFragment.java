@@ -1,12 +1,19 @@
 package sinapsel.nettools.fragments;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Messenger;
 import android.app.Fragment;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +22,10 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import sinapsel.nettools.R;
+import sinapsel.nettools.service.GetIPAddress;
 import sinapsel.nettools.service.http.FolderHTTPService;
 import sinapsel.nettools.service.http.SingletonHTTPServerService;
 
@@ -40,6 +49,18 @@ public class FolderHttpServerFragment extends Fragment {
     }
 
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
+        if (requestCode == 2) {
+            if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getActivity(), "Permissions are required!", Toast.LENGTH_LONG).show();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_folder_http_server, container, false);
@@ -48,6 +69,30 @@ public class FolderHttpServerFragment extends Fragment {
         sockservconinfo = view.findViewById(R.id.sockservconnectinfo);
         editroute = view.findViewById(R.id.route);
 
+        if (!(ActivityCompat.checkSelfPermission(getActivity().
+                getApplicationContext(), Manifest.permission.
+                READ_EXTERNAL_STORAGE) == ActivityCompat.
+                checkSelfPermission(getActivity().
+                        getApplicationContext(),
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                && ActivityCompat.checkSelfPermission(getActivity().
+                getApplicationContext(), Manifest.permission.
+                WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+            } else{
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+            }
+
+        }
+
+        if (isMyServiceRunning(FolderHTTPService.class)){
+            switcher.setChecked(true);
+            sockservconinfo.setText( GetIPAddress.getIP().concat(":").concat(Integer.toString(7777)));
+        }
 
         switcher.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
             @Override
@@ -81,6 +126,18 @@ public class FolderHttpServerFragment extends Fragment {
 
 
         return view;
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getActivity().getSystemService(Context.ACTIVITY_SERVICE);
+        if (manager != null) {
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+                if (serviceClass.getName().equals(service.service.getClassName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override

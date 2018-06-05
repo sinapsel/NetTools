@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,7 +21,7 @@ import java.util.List;
 
 import sinapsel.nettools.R;
 import sinapsel.nettools.service.TracerouteContainer;
-import sinapsel.nettools.service.TracerouteWithPing;
+import sinapsel.nettools.service.Traceroute;
 
 public class TracerouteFragment extends Fragment {
 
@@ -35,7 +34,7 @@ public class TracerouteFragment extends Fragment {
     private ListView listViewTraceroute;
     private TraceListAdapter traceListAdapter;
 
-    private TracerouteWithPing tracerouteWithPing;
+    private Traceroute tracerouteWithPing;
     private final int maxTtl = 40;
 
     private List<TracerouteContainer> traces;
@@ -54,7 +53,7 @@ public class TracerouteFragment extends Fragment {
         super.onCreate(savedInstanceState);
 //        setContentView(R.layout.activity_trace);
 
-        this.tracerouteWithPing = new TracerouteWithPing(TracerouteFragment.this);
+        this.tracerouteWithPing = new Traceroute(TracerouteFragment.this);
         this.traces = new ArrayList<TracerouteContainer>();
 
         this.buttonLaunch = (Button) view.findViewById(R.id.buttonLaunch);
@@ -150,9 +149,9 @@ public class TracerouteFragment extends Fragment {
             TracerouteContainer currentTrace = getItem(position);
 
             if (position % 2 == 1) {
-                convertView.setBackgroundResource(R.drawable.table_odd_lines);
+                convertView.setBackgroundResource(R.color.c4_even);
             } else {
-                convertView.setBackgroundResource(R.drawable.table_pair_lines);
+                convertView.setBackgroundResource(R.color.c4_odd);
             }
 
             if (currentTrace.isSuccessful()) {

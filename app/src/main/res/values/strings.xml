@@ -6,7 +6,6 @@
 
     <string name="action_settings">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="refresh_ip">Refresh IP</string>
     <string name="ip">IP</string>
@@ -43,5 +42,15 @@
     <string name="edit_html">Edit HTML</string>
     <string name="send_a_query">Send a query</string>
     <string name="http_server_from_folder">HTTP Server from folder</string>
+    <string name="title_activity_help">laCAT: Hello!</string>
+
+    <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="PNAME">laCAT_FLD</string>
+    <string name="PFIELD">laCAT_First_time</string>
+    <string name="logo">LOGO</string>
+    <string name="click_me_or_swipe_to_open_navigation_bar">Click me or swipe to open navigation bar</string>
+    <string name="help">HELP</string>
+    <string name="close">Close</string>
 
 </resources>

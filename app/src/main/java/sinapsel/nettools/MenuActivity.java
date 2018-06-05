@@ -5,10 +5,14 @@ import sinapsel.nettools.fragments.IPFragment;
 import sinapsel.nettools.fragments.PingFragment;
 import sinapsel.nettools.fragments.QueryFragment;
 import sinapsel.nettools.fragments.HTTPServerSingletonFragment;
+import sinapsel.nettools.fragments.StartFragment;
 import sinapsel.nettools.fragments.TracerouteFragment;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -29,7 +33,7 @@ public class MenuActivity extends AppCompatActivity
     Fragment trsFragment;
     Fragment qryFragment;
     Fragment fhsFragment;
-    ImageView cat;
+    Fragment strFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,15 +58,19 @@ public class MenuActivity extends AppCompatActivity
         trsFragment = new TracerouteFragment();
         qryFragment = new QueryFragment();
         fhsFragment = new FolderHttpServerFragment();
+        strFragment = new StartFragment();
 
-        //Cat opens drawer
-        cat = findViewById(R.id.catclick);
-        cat.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((DrawerLayout) findViewById(R.id.drawer_layout)).openDrawer(GravityCompat.START);
-            }
-        });
+        Prefs prefManager = new Prefs(this);
+        if (prefManager.isFirstTime()){
+            prefManager.setOpened();
+            prefManager.showHelpActivity();
+        }
+
+        if (savedInstanceState == null){
+            FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
+            fragmentTransaction.replace(R.id.menucontainer, strFragment);
+            fragmentTransaction.commit();
+        }
     }
 
     /**
@@ -87,8 +95,6 @@ public class MenuActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-        cat.setVisibility(View.INVISIBLE);
-        findViewById(R.id.clickmeannotation).setVisibility(View.INVISIBLE);
         if (id == R.id.nav_ip) { // i'd like to use switch here but don't want writing <<break>> every condition
             fragmentTransaction.replace(R.id.menucontainer, ipFragment);
         } else if (id == R.id.nav_ping) {
@@ -108,5 +114,25 @@ public class MenuActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    class Prefs {
+        SharedPreferences preferences;
+
+        Prefs(Context context) {
+            preferences = context.getSharedPreferences(getString(R.string.PNAME), 0);
+        }
+
+        private void setOpened() {
+            preferences.edit().putBoolean(getString(R.string.PFIELD), false).apply();
+        }
+
+        private boolean isFirstTime() {
+            return preferences.getBoolean(getString(R.string.PFIELD), true);
+        }
+
+        public void showHelpActivity(){
+            startActivity(new Intent(MenuActivity.this, HelpActivity.class));
+        }
     }
 }

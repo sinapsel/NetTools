@@ -1,16 +1,16 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/high_greenly_blue</item>
-        <item name="colorPrimaryDark">@color/high_greenly_blueDark</item>
-        <item name="colorAccent">@color/Salmon_red</item>
-    </style>
 
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
+        <item name="colorPrimary">@color/c2</item>
+        <item name="colorPrimaryDark">@color/c1</item>
+        <item name="colorAccent">@color/c3</item>
+        <item name="android:windowBackground">@color/c4</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/c1</item>
+        <item name="colorButtonNormal">#b7ccbf</item>
+
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

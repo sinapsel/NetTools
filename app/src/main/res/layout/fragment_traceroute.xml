@@ -11,9 +11,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
+            android:ems="10"
             android:hint="@string/placeholder"
-            android:inputType="text"
-            android:ems="10" />
+            android:inputType="textUri" />
 
         <Button
             android:id="@+id/buttonLaunch"

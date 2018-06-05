@@ -16,7 +16,7 @@
         android:layout_weight="0.2"
         android:gravity="left"
         android:text="@string/string_test"
-        android:textColor="@color/red_color" />
+        android:textColor="@color/c3" />
 
     <ImageView
         android:id="@+id/imageViewStatusPing"

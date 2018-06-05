@@ -1,9 +1,11 @@
 package sinapsel.nettools.service.http;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -13,6 +15,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -49,6 +52,9 @@ public class FolderHTTPService extends Service {
         super();
     }
 
+    public String getBASE_ROUTE() {
+        return BASE_ROUTE;
+    }
 
     @Override
     public void onCreate() {
@@ -154,7 +160,13 @@ public class FolderHTTPService extends Service {
                                     headers.setLength(content.length());
                                 }
                                 else if (!Environment.getExternalStorageState().equals(
-                                        Environment.MEDIA_MOUNTED)) {
+                                        Environment.MEDIA_MOUNTED) || (!(ActivityCompat.checkSelfPermission(
+                                        getApplicationContext(), Manifest.permission.
+                                        READ_EXTERNAL_STORAGE) == ActivityCompat.
+                                        checkSelfPermission(getApplicationContext(),
+                                                Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                        && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.
+                                        WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED))) {
                                     Log.d("FILEREADER", "SD-карта не доступна: " + Environment.getExternalStorageState());
                                     headers.setHTTP_Status("ERR403");
                                     headers.setContent_type("HTML");

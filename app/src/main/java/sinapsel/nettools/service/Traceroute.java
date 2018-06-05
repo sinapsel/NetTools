@@ -21,7 +21,7 @@ import java.util.List;
 
 import sinapsel.nettools.fragments.TracerouteFragment;
 
-public class TracerouteWithPing {
+public class Traceroute {
 	/**
 	 * STRING CONSTANTS
 	 */
@@ -46,7 +46,7 @@ public class TracerouteWithPing {
 	private static final int TIMEOUT = 30000;
 	private Handler handlerTimeout;
 	private static Runnable runnableTimeout;
-	public TracerouteWithPing(Fragment context) {
+	public Traceroute(Fragment context) {
 		this.context = (TracerouteFragment)context;
 	}
 
@@ -291,7 +291,7 @@ public class TracerouteWithPing {
 				Toast.makeText(context.getActivity().getApplicationContext(), context.getString(R.string.error), Toast.LENGTH_SHORT).show();
 			}
 
-            ((TracerouteFragment)context).stopProgressBar();
+            context.stopProgressBar();
 
 			finishedTasks++;
 		}

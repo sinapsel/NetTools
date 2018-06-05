@@ -1,7 +1,6 @@
 package sinapsel.nettools.fragments;
 
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -17,9 +16,7 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import sinapsel.nettools.R;
-import sinapsel.nettools.service.Ping;
 import sinapsel.nettools.service.SocketClient;
-import sinapsel.nettools.service.TracerouteWithPing;
 
 public class QueryFragment extends Fragment {
     EditText ip, headers, body, output, portfield;

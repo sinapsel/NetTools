@@ -2,13 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="simapps.nettools.fragments.IPFragment">
+    tools:context=".fragments.IPFragment">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id = "@+id/iptextview"
         android:textAlignment="center"
-        android:textSize="32sp"
+        android:textSize="38sp"
         android:layout_above="@+id/refreshipbutton"
         android:layout_marginBottom="20dp"
         />

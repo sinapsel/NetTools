@@ -21,4 +21,11 @@
     <color name="high_greenly_blue">#00ffff</color>
     <color name="high_greenly_blueDark">#00cccc</color>
     <color name="Salmon_red">#d95030</color>
+    
+    <color name="c1">#FF4D5C98</color>
+    <color name="c2">#FF6574B2</color>
+    <color name="c3">#FF7BC255</color>
+    <color name="c4">#fff3ed</color>
+    <color name="c4_odd">#d7ccc8</color>
+    <color name="c4_even">#fff3ed</color>
 </resources>
